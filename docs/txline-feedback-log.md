@@ -19,7 +19,30 @@ Friction and highlights recorded during development — the submission form has 
 - **2026-07-10** — `validateStat` supporting predicates (threshold + comparison) and two-stat
   operations enables prop-bet style markets without any custom oracle logic.
 
-## Open questions for TxODDS (Discord)
+## Resolved questions
 
-- Is `validateStat` designed to be called via CPI from a third-party program, or only via
-  `.view()` simulation? The track brief mentions CPI explicitly; the docs only show `.view()`.
+- **2026-07-10** — *Is `validateStat` callable via CPI from a third-party program?* **Yes.**
+  Fetched the on-chain IDL (`program/idl/txoracle.json`): `validate_stat` takes a single
+  read-only account (`daily_scores_merkle_roots`, a public PDA) and **no signer**, so any
+  program can CPI into it. Semantics: the instruction succeeds iff the Merkle proofs verify
+  against the on-chain daily root **and** the predicate holds; otherwise it errors
+  (`PredicateFailed` 6021, `InvalidMainTreeProof` 6004, `InvalidStatProof` 6023, …).
+  There is no declared return value — "no error" is the attestation.
+
+## More friction
+
+- **2026-07-10** — The published devnet IDL has no PDA seed metadata and the docs don't list
+  the fixed accounts `subscribe` needs (`pricing_matrix`, treasury vault/PDA). We had to scan
+  recent devnet transactions for a successful `subscribe` and copy its account list
+  (`keeper/src/discover-accounts.ts`). Publishing these addresses on the Program Reference
+  page (like the TxL mint) would remove that step.
+- **2026-07-10** — Devnet SOL is the real onboarding bottleneck: the public faucet rate-limits
+  aggressively, and the free-tier `subscribe` cannot be sent without it. A devnet
+  `request_devnet_faucet`-style instruction exists for USDT — a small SOL top-up equivalent
+  (or a relayer that co-pays the subscribe fee) would make the free tier truly zero-friction.
+
+## Highlights (cont.)
+
+- **2026-07-10** — The txoracle program ships a full P2P trading layer on devnet
+  (`create_intent`, `execute_match`, `settle_matched_trade`, `claim_via_resolution`) —
+  useful as a reference for how TxODDS themselves consume `validate_stat`-style proofs.
