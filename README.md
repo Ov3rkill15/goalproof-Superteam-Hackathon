@@ -43,8 +43,10 @@ TxLINE SSE feeds (scores + odds, devnet)
 
 - [x] TxLINE devnet access verified (guest JWT flow works)
 - [x] Ingestion: SSE consumer + JSONL recorder + replay mode
-- [ ] On-chain subscribe + API token activation (free World Cup tier)
-- [ ] Anchor program: market/escrow/resolve/payout
+- [x] CPI feasibility confirmed: `validate_stat` = 1 read-only PDA, no signer (`program/idl/txoracle.json`)
+- [x] Anchor program source: create_market / take_position / resolve (CPI) / claim
+- [ ] On-chain subscribe + API token activation — script ready (`keeper: npm run activate`), **blocked on devnet SOL faucet**
+- [ ] Build + deploy program to devnet (WSL toolchain install pending)
 - [ ] Keeper bot
 - [ ] Dashboard
 - [ ] Deploy + demo video
