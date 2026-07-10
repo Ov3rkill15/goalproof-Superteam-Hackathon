@@ -5,7 +5,7 @@ resolution = true
 skip-lint = false
 
 [programs.devnet]
-goalproof = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+goalproof = "8RnQwJk6FN5rioUaGqEruyXENxQZNBdgJQUHCgpr4MNP"
 
 [registry]
 url = "https://api.apr.dev"
