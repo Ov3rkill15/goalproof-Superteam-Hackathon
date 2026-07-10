@@ -1,0 +1,23 @@
+# secrets
+.env
+*wallet*.json
+!*wallet*.example.json
+
+# recordings can get large; commit only curated demo recordings explicitly
+ingestion/recordings/*.jsonl
+
+# Go
+ingestion/ingestion
+ingestion/ingestion.exe
+
+# Node
+node_modules/
+dist/
+.next/
+
+# Rust / Anchor
+program/target/
+program/.anchor/
+
+# misc
+*.log
