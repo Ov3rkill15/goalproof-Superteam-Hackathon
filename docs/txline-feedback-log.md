@@ -41,6 +41,12 @@ Friction and highlights recorded during development — the submission form has 
   `request_devnet_faucet`-style instruction exists for USDT — a small SOL top-up equivalent
   (or a relayer that co-pays the subscribe fee) would make the free tier truly zero-friction.
 
+- **2026-07-10** — `subscribe` fails with `AccountNotInitialized` (3012) on `user_token_account`
+  unless the user's TxL ATA (Token-2022) already exists, even on the free tier where 0 TxL is
+  charged. The instruction takes the Associated Token Program as an account, so init-if-needed
+  seems intended but isn't wired. Workaround: prepend a `CreateIdempotent` ATA instruction in
+  the same transaction (`keeper/src/activate-txline.ts`).
+
 ## Highlights (cont.)
 
 - **2026-07-10** — The txoracle program ships a full P2P trading layer on devnet

@@ -11,7 +11,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import nacl from "tweetnacl";
-import { Connection, Keypair, PublicKey } from "@solana/web3.js";
+import { Connection, Keypair, PublicKey, TransactionInstruction } from "@solana/web3.js";
 import anchorPkg from "@coral-xyz/anchor";
 const { AnchorProvider, Program, Wallet } = anchorPkg;
 import { repoRoot, TXLINE_ORIGIN, SOLANA_RPC_URL } from "./env.js";
@@ -82,9 +82,26 @@ const [userTokenAccount] = PublicKey.findProgramAddressSync(
   DEVNET.ataProgram,
 );
 
+// txoracle expects the user's TxL ATA to already exist (AccountNotInitialized 3012
+// otherwise) — create it idempotently in the same transaction. Instruction layout per
+// the Associated Token Account program: data [1] = CreateIdempotent.
+const createAtaIx = new TransactionInstruction({
+  programId: DEVNET.ataProgram,
+  keys: [
+    { pubkey: keypair.publicKey, isSigner: true, isWritable: true },
+    { pubkey: userTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: keypair.publicKey, isSigner: false, isWritable: false },
+    { pubkey: DEVNET.tokenMint, isSigner: false, isWritable: false },
+    { pubkey: new PublicKey("11111111111111111111111111111111"), isSigner: false, isWritable: false },
+    { pubkey: DEVNET.token2022, isSigner: false, isWritable: false },
+  ],
+  data: Buffer.from([1]),
+});
+
 console.log(`sending subscribe(service_level_id=${SERVICE_LEVEL_ID}, weeks=${DURATION_WEEKS})…`);
 const txSig = await program.methods
   .subscribe(SERVICE_LEVEL_ID, DURATION_WEEKS)
+  .preInstructions([createAtaIx])
   .accounts({
     user: keypair.publicKey,
     pricingMatrix: DEVNET.pricingMatrix,
