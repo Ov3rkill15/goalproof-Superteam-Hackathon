@@ -85,8 +85,10 @@ func runLive(ctx context.Context, stream, recordPath string) error {
 	lastEventID := ""
 	backoff := time.Second
 
+	connectedOnce := false
 	for {
 		err := consumeStream(ctx, url, stream, jwt, &lastEventID, func(ev Event) {
+			connectedOnce = true  // credentials accepted and data is flowing
 			backoff = time.Second // healthy connection: reset reconnect backoff
 			printEvent(ev)
 			if rec != nil {
@@ -100,9 +102,24 @@ func runLive(ctx context.Context, stream, recordPath string) error {
 		}
 		var httpErr *httpStatusError
 		if errors.As(err, &httpErr) && (httpErr.Code == http.StatusUnauthorized || httpErr.Code == http.StatusForbidden) {
-			return fmt.Errorf("%w\nstream rejected the credentials — the free World Cup tier still requires "+
-				"the on-chain subscribe + POST /api/token/activate flow; set TXLINE_API_TOKEN in .env "+
-				"(see docs/txline-openapi.yaml)", err)
+			if !connectedOnce {
+				// Credentials were never accepted: a genuine auth gap, not an
+				// expired session. Re-authing would loop forever, so bail out
+				// with the actionable hint instead.
+				return fmt.Errorf("%w\nstream rejected the credentials — the free World Cup tier still requires "+
+					"the on-chain subscribe + POST /api/token/activate flow; set TXLINE_API_TOKEN in .env "+
+					"(see docs/txline-openapi.yaml)", err)
+			}
+			// We had a healthy session, so the guest JWT most likely expired
+			// mid-run. Mint a fresh one and keep going instead of dying silently
+			// (matters for long unattended recordings that must survive a match).
+			log.Printf("credentials rejected after a healthy session (%v); refreshing guest token", err)
+			if newJWT, aerr := guestToken(ctx); aerr != nil {
+				log.Printf("guest re-auth failed (will retry): %v", aerr)
+			} else {
+				jwt = newJWT
+				log.Printf("guest session refreshed")
+			}
 		}
 		log.Printf("stream disconnected (%v), reconnecting in %s", err, backoff)
 		select {
