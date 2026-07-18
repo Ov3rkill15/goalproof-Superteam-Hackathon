@@ -9,7 +9,7 @@ import { PROGRAM_ID, TXORACLE_ID, explorerAddress } from "./config";
 
 const ORDER: Record<Lifecycle, number> = { open: 0, locked: 1, resolved: 2, upcoming: 3 };
 
-export function App() {
+export function Dashboard() {
   const replay = useReplay();
   const markets = useMemo(() => source.markets(replay.minute), [replay.minute]);
 
@@ -77,7 +77,7 @@ function HowItSettles() {
 function Brand() {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <div className="flex items-center gap-3">
+      <a href="#/" className="group flex items-center gap-3">
         <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-pitch-400 to-pitch-600 shadow-lg shadow-pitch-500/20 ring-1 ring-white/20">
           <svg viewBox="0 0 24 24" className="h-6 w-6 text-ink-950" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 2 4 5v6c0 5 3.4 8.3 8 11 4.6-2.7 8-6 8-11V5l-8-3Z" fill="currentColor" fillOpacity="0.15" />
@@ -86,9 +86,11 @@ function Brand() {
         </div>
         <div>
           <h1 className="font-display text-lg font-bold tracking-tight text-slate-50">GoalProof</h1>
-          <p className="text-[11px] text-slate-400">No oracle to trust — every outcome is a Merkle proof the chain verifies itself</p>
+          <p className="text-[11px] text-slate-400 transition-colors group-hover:text-slate-300">
+            <span className="text-pitch-400 opacity-0 transition-opacity group-hover:opacity-100">←</span> Live board · every outcome verified on-chain
+          </p>
         </div>
-      </div>
+      </a>
       <div className="flex items-center gap-3 text-[11px]">
         <a href={explorerAddress(PROGRAM_ID)} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-pitch-400">
           program ↗

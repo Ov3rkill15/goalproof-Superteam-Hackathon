@@ -20,7 +20,7 @@ export function MatchHeader({ minute }: { minute: number }) {
 
   return (
     <header className="relative overflow-hidden rounded-3xl border border-ink-700/60 bg-ink-900/60 shadow-2xl shadow-black/40 backdrop-blur-sm">
-      <ProofMesh />
+      <HeaderBackdrop />
 
       <div className="relative px-5 py-5 sm:px-8 sm:py-6">
         {/* meta row */}
@@ -96,37 +96,14 @@ function ClockBadge({ label, live, phase }: { label: string; live: boolean; phas
   );
 }
 
-/** Faint Merkle-tree motif — the identity texture. Not a football pitch. */
-function ProofMesh() {
-  // a small binary tree: 1 root, 2, 4 leaves
-  const nodes = [
-    [50, 16],
-    [30, 45],
-    [70, 45],
-    [18, 74],
-    [42, 74],
-    [58, 74],
-    [82, 74],
-  ];
-  const edges = [
-    [0, 1],
-    [0, 2],
-    [1, 3],
-    [1, 4],
-    [2, 5],
-    [2, 6],
-  ];
+/** Clean, symmetric header backdrop — a centered brand glow and a hairline base.
+ *  Deliberately does NOT overlap the scoreline (the earlier tree motif collided
+ *  with the away team and read as a glitch). */
+function HeaderBackdrop() {
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-0">
-      <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-pitch-500/10 blur-3xl" />
-      <svg className="absolute right-0 top-0 h-full w-1/2 opacity-[0.13]" viewBox="0 0 100 90" fill="none" preserveAspectRatio="xMidYMid meet">
-        {edges.map(([a, b], i) => (
-          <line key={i} x1={nodes[a][0]} y1={nodes[a][1]} x2={nodes[b][0]} y2={nodes[b][1]} stroke="#9a8cff" strokeWidth="0.4" />
-        ))}
-        {nodes.map(([x, y], i) => (
-          <circle key={i} cx={x} cy={y} r={i === 0 ? 2.4 : 1.6} fill={i === 0 ? "#c2f24a" : "#9a8cff"} />
-        ))}
-      </svg>
+    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="absolute left-1/2 top-[-6rem] h-64 w-[46rem] max-w-[120%] -translate-x-1/2 rounded-full bg-pitch-500/12 blur-3xl" />
+      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-pitch-500/25 to-transparent" />
     </div>
   );
 }
