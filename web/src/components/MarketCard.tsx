@@ -16,7 +16,7 @@ function statExpr(m: MarketState): string {
   const { spec } = m;
   const noun = statNoun(spec.statAKey);
   if (spec.statBKey === undefined) return `${side(spec.statAKey)} ${noun}`;
-  if (spec.op === "subtract") return `${noun} margin (home − away)`;
+  if (spec.op === "subtract") return `${noun} margin (H − A)`;
   return `Total ${noun}`;
 }
 
@@ -24,125 +24,142 @@ const USD = (n: number) => `$${n.toLocaleString("en-US")}`;
 
 export function MarketCard({ market }: { market: MarketState }) {
   const { lifecycle, resolution } = market;
+  const onChain = resolution?.onChain;
   const yesPct = Math.round(market.impliedYes * 100);
-  const noPct = 100 - yesPct;
 
   return (
-    <article className="animate-card-in flex flex-col rounded-2xl border border-ink-700/70 bg-ink-850/70 p-4 shadow-lg shadow-black/30 transition-colors hover:border-ink-600">
+    <article
+      className={`animate-card-in group relative flex flex-col rounded-2xl border bg-ink-850/50 p-4 backdrop-blur-sm transition-all duration-300 ${
+        onChain
+          ? "border-proof-500/40 shadow-[0_0_0_1px_rgba(166,224,47,0.15),0_10px_40px_-12px_rgba(166,224,47,0.25)]"
+          : "border-ink-700/60 hover:border-ink-600 hover:bg-ink-850/80"
+      }`}
+    >
       <div className="flex items-center justify-between gap-2">
-        <span className="rounded-md bg-ink-800 px-2 py-0.5 text-[11px] font-medium text-slate-400">{market.periodLabel}</span>
-        <LifecycleBadge market={market} />
+        <span className="font-mono text-[10.5px] uppercase tracking-wider text-slate-500">{market.periodLabel}</span>
+        <ProofChip market={market} />
       </div>
 
-      <h3 className="mt-2 text-sm font-semibold leading-snug text-slate-100">{market.spec.title}</h3>
+      <h3 className="mt-2.5 font-display text-[15px] font-semibold leading-snug text-slate-50">{market.spec.title}</h3>
 
-      <div className="mt-2 flex items-center gap-2 text-xs text-slate-400">
-        <span className="font-mono">
-          {statExpr(market)} {COMPARISON_SYMBOL[market.spec.comparison]} {market.spec.threshold}
+      <div className="mt-2 flex items-center justify-between gap-2 text-xs">
+        <span className="font-mono text-slate-400">
+          {statExpr(market)} <span className="text-slate-500">{COMPARISON_SYMBOL[market.spec.comparison]}</span> {market.spec.threshold}
         </span>
         <span
-          className={`ml-auto rounded-md px-2 py-0.5 font-mono tabular-nums ${
-            market.currentlyTrue ? "bg-yes/15 text-pitch-400" : "bg-ink-800 text-slate-300"
+          className={`rounded-md px-2 py-0.5 font-mono tabular-nums ${
+            market.currentlyTrue ? "bg-pitch-500/15 text-pitch-300" : "bg-ink-800 text-slate-400"
           }`}
           title="live value from the feed"
         >
-          now: {market.statValue}
+          now {market.statValue}
         </span>
       </div>
 
-      {/* implied-probability bar */}
-      <div className="mt-3">
-        <div className="flex h-2 overflow-hidden rounded-full bg-ink-800">
-          <div className="bg-yes/70" style={{ width: `${yesPct}%` }} />
-          <div className="bg-no/70" style={{ width: `${noPct}%` }} />
-        </div>
-        <div className="mt-1.5 flex justify-between text-[11px] font-mono tabular-nums">
-          <span className="text-pitch-400">YES {yesPct}% · {USD(market.yesPool)}</span>
-          <span className="text-rose-400">{USD(market.noPool)} · {noPct}% NO</span>
-        </div>
-      </div>
-
-      <div className="mt-3 border-t border-ink-700/60 pt-3 text-xs">
-        {lifecycle === "resolved" && resolution ? (
-          <Resolved market={market} />
-        ) : lifecycle === "open" ? (
-          <span className="text-pitch-400">● Betting open — closes at kick-off</span>
-        ) : lifecycle === "upcoming" ? (
-          <span className="text-slate-500">Opens at half-time</span>
-        ) : (
-          <span className="text-amber-300/90">🔒 Locked — settles on proof at {market.resolveMinute === 45 ? "half-time" : "full-time"}</span>
-        )}
-      </div>
+      {lifecycle === "resolved" && resolution ? (
+        <ResolvedReceipt market={market} />
+      ) : (
+        <>
+          {/* market-implied probability — quiet, desaturated */}
+          <div className="mt-3.5">
+            <div className="flex h-1.5 overflow-hidden rounded-full bg-ink-800">
+              <div className="bg-yes/60" style={{ width: `${yesPct}%` }} />
+              <div className="bg-no/50" style={{ width: `${100 - yesPct}%` }} />
+            </div>
+            <div className="mt-1.5 flex items-center justify-between font-mono text-[11px] tabular-nums text-slate-500">
+              <span><span className="text-yes">YES {yesPct}%</span> · {USD(market.yesPool)}</span>
+              <span>{USD(market.noPool)} · <span className="text-no">NO {100 - yesPct}%</span></span>
+            </div>
+          </div>
+          <div className="mt-3 border-t border-ink-700/50 pt-2.5 text-[11px]">
+            {lifecycle === "open" ? (
+              <span className="inline-flex items-center gap-1.5 text-pitch-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-pitch-400" /> Open — closes at kick-off
+              </span>
+            ) : lifecycle === "upcoming" ? (
+              <span className="text-slate-500">Opens at half-time</span>
+            ) : (
+              <LockedAwaitingProof minute={market.resolveMinute} />
+            )}
+          </div>
+        </>
+      )}
     </article>
   );
 }
 
-function LifecycleBadge({ market }: { market: MarketState }) {
+function ProofChip({ market }: { market: MarketState }) {
+  const onChain = market.resolution?.onChain;
+  if (market.lifecycle === "resolved") {
+    return onChain ? (
+      <span className="inline-flex items-center gap-1 rounded-md bg-proof-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-proof-300 ring-1 ring-proof-500/30">
+        ✓ On-chain
+      </span>
+    ) : (
+      <span className="rounded-md bg-ink-800 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-400">Settled</span>
+    );
+  }
   const map: Record<string, { label: string; cls: string }> = {
-    open: { label: "OPEN", cls: "bg-pitch-500/15 text-pitch-400" },
-    locked: { label: "LIVE", cls: "bg-amber-500/15 text-amber-300" },
-    upcoming: { label: "SOON", cls: "bg-ink-800 text-slate-500" },
-    resolved: { label: "SETTLED", cls: "bg-ink-800 text-slate-400" },
+    open: { label: "Open", cls: "bg-pitch-500/15 text-pitch-300" },
+    locked: { label: "Locked", cls: "bg-amber-500/15 text-amber-300" },
+    upcoming: { label: "Soon", cls: "bg-ink-800 text-slate-500" },
   };
   const s = map[market.lifecycle];
-  return <span className={`rounded-md px-2 py-0.5 text-[11px] font-semibold ${s.cls}`}>{s.label}</span>;
+  return <span className={`rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${s.cls}`}>{s.label}</span>;
 }
 
-function Resolved({ market }: { market: MarketState }) {
+function LockedAwaitingProof({ minute }: { minute: number }) {
+  return (
+    <span className="relative inline-flex items-center gap-1.5 overflow-hidden text-amber-300/90">
+      <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-live" />
+      Locked — awaiting proof at {minute === 45 ? "half-time" : "full-time"}
+    </span>
+  );
+}
+
+function ResolvedReceipt({ market }: { market: MarketState }) {
   const r = market.resolution!;
   const won = r.outcome;
+  const onChain = r.onChain;
   return (
-    <div className="space-y-2">
-      <div className={`flex items-center gap-2 font-semibold ${won ? "text-pitch-400" : "text-rose-400"}`}>
-        <span>{won ? "✓ YES" : "✗ NO"} wins</span>
-        {r.onChain ? (
-          <span className="rounded bg-pitch-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-pitch-400" title="settled by real CPI into txoracle validate_stat on devnet">
-            ✓ VERIFIED ON-CHAIN
-          </span>
-        ) : (
-          <span className="font-normal text-slate-500">· proof-backed on-chain</span>
-        )}
+    <div className="mt-3.5 border-t border-ink-700/60 pt-3">
+      <div className="flex items-center justify-between">
+        <span className={`inline-flex items-center gap-1.5 font-display text-sm font-bold ${won ? "text-yes" : "text-no"}`}>
+          {won ? "YES" : "NO"} settled
+        </span>
+        <span className={`font-mono text-[11px] ${onChain ? "text-proof-300" : "text-slate-500"}`}>
+          {onChain ? "proof verified on-chain" : "proof-backed"}
+        </span>
       </div>
-      <div className="rounded-lg bg-ink-900/70 p-2 font-mono text-[10.5px] leading-relaxed text-slate-400">
-        <div>
-          predicate: <span className="text-slate-300">value {predicateLabel(r.predicateUsed.threshold, r.predicateUsed.comparison)}</span>{" "}
-          {won ? "(market)" : "(complement)"}
+
+      <dl className="mt-2.5 space-y-1.5 rounded-lg bg-ink-900/60 p-2.5 font-mono text-[10.5px] leading-relaxed">
+        <div className="flex justify-between gap-2">
+          <dt className="text-slate-500">predicate</dt>
+          <dd className="text-slate-300">value {predicateLabel(r.predicateUsed.threshold, r.predicateUsed.comparison)} {won ? "" : "(complement)"}</dd>
         </div>
-        <div className="truncate">
-          root: <span className="text-slate-300">{r.proofRootPreview.slice(0, 16)}…</span>
+        <div className="flex justify-between gap-2">
+          <dt className="text-slate-500">merkle root</dt>
+          <dd className="truncate text-slate-400">{r.proofRootPreview.slice(0, 18)}…</dd>
         </div>
-      </div>
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+      </dl>
+
+      <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
         <a
           href={explorerTx(r.txSignature)}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-1 text-pitch-400 hover:text-pitch-500 transition-colors"
-          title="resolve tx: CPI into txoracle validate_stat"
+          className={`inline-flex items-center gap-1 font-mono transition-colors ${onChain ? "text-proof-400 hover:text-proof-300" : "text-pitch-300 hover:text-pitch-400"}`}
+          title="resolve tx — CPI into txoracle validate_stat"
         >
-          <span className="font-mono">resolve {r.txSignature.slice(0, 6)}…{r.txSignature.slice(-4)}</span>
-          <span>↗</span>
+          resolve {r.txSignature.slice(0, 6)}… <span className="opacity-60">↗</span>
         </a>
-        {r.onChain && (
+        {onChain && (
           <>
-            <a
-              href={explorerTx(r.onChain.claimTx)}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 text-slate-400 hover:text-slate-200 transition-colors"
-              title="claim tx: winner paid out from the market vault"
-            >
-              <span className="font-mono">claim {r.onChain.claimTx.slice(0, 6)}…</span>
-              <span>↗</span>
+            <a href={explorerTx(onChain.claimTx)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-mono text-slate-400 transition-colors hover:text-slate-200" title="claim tx — winner paid from the vault">
+              claim {onChain.claimTx.slice(0, 6)}… <span className="opacity-60">↗</span>
             </a>
-            <a
-              href={explorerAddress(r.onChain.marketAddress)}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 text-slate-400 hover:text-slate-200 transition-colors"
-              title="the market account on devnet"
-            >
-              <span className="font-mono">market ↗</span>
+            <a href={explorerAddress(onChain.marketAddress)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-mono text-slate-400 transition-colors hover:text-slate-200" title="market account on devnet">
+              market <span className="opacity-60">↗</span>
             </a>
           </>
         )}

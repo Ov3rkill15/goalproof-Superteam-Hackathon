@@ -28,9 +28,11 @@ export function App() {
         <MatchHeader minute={replay.minute} />
       </div>
 
+      <HowItSettles />
+
       <StatStrip liveCount={liveCount} settled={settled} volume={volume} />
 
-      <main className="mt-4 grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <main className="mt-4 grid flex-1 grid-cols-1 gap-3 pb-28 sm:grid-cols-2 lg:grid-cols-3">
         {visible.map((m) => (
           <MarketCard key={m.id} market={m} />
         ))}
@@ -38,6 +40,37 @@ export function App() {
 
       <ReplayBar replay={replay} />
     </div>
+  );
+}
+
+/** The differentiator, stated plainly: how an outcome becomes a fact the chain checks. */
+function HowItSettles() {
+  const steps = [
+    { n: "1", title: "Anchored", body: "TxLINE commits every match stat into a daily Merkle root stored on Solana." },
+    { n: "2", title: "Proven", body: "At period end, the keeper fetches that stat's Merkle proof from TxLINE." },
+    { n: "3", title: "Verified", body: "The program re-checks the proof on-chain via CPI — it settles only if the math holds." },
+  ];
+  return (
+    <section className="mt-4 overflow-hidden rounded-2xl border border-ink-700/60 bg-ink-900/40 px-4 py-3.5 backdrop-blur-sm sm:px-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch sm:gap-0">
+        {steps.map((s, i) => (
+          <div key={s.n} className="flex flex-1 items-start gap-3 sm:px-4 sm:first:pl-0">
+            <span
+              className={`grid h-6 w-6 shrink-0 place-items-center rounded-md font-mono text-xs font-bold ${
+                i === 2 ? "bg-proof-500/20 text-proof-300 ring-1 ring-proof-500/40" : "bg-pitch-500/15 text-pitch-300 ring-1 ring-pitch-500/30"
+              }`}
+            >
+              {s.n}
+            </span>
+            <div className="min-w-0">
+              <div className={`text-xs font-semibold ${i === 2 ? "text-proof-300" : "text-slate-200"}`}>{s.title}</div>
+              <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500">{s.body}</p>
+            </div>
+            {i < steps.length - 1 && <span aria-hidden className="hidden self-center text-slate-600 sm:block">→</span>}
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -52,8 +85,8 @@ function Brand() {
           </svg>
         </div>
         <div>
-          <h1 className="text-lg font-bold tracking-tight text-slate-50">GoalProof</h1>
-          <p className="text-[11px] text-slate-500">Provable micro-markets, settled on Solana against TxLINE Merkle proofs</p>
+          <h1 className="font-display text-lg font-bold tracking-tight text-slate-50">GoalProof</h1>
+          <p className="text-[11px] text-slate-400">No oracle to trust — every outcome is a Merkle proof the chain verifies itself</p>
         </div>
       </div>
       <div className="flex items-center gap-3 text-[11px]">
