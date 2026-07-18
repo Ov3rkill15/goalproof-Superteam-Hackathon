@@ -45,7 +45,12 @@ function Brand() {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex items-center gap-3">
-        <div className="grid h-9 w-9 place-items-center rounded-xl bg-pitch-500 text-lg font-black text-ink-950">G</div>
+        <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-pitch-400 to-pitch-600 shadow-lg shadow-pitch-500/20 ring-1 ring-white/20">
+          <svg viewBox="0 0 24 24" className="h-6 w-6 text-ink-950" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2 4 5v6c0 5 3.4 8.3 8 11 4.6-2.7 8-6 8-11V5l-8-3Z" fill="currentColor" fillOpacity="0.15" />
+            <path d="m9 12 2 2 4-4" />
+          </svg>
+        </div>
         <div>
           <h1 className="text-lg font-bold tracking-tight text-slate-50">GoalProof</h1>
           <p className="text-[11px] text-slate-500">Provable micro-markets, settled on Solana against TxLINE Merkle proofs</p>
@@ -76,8 +81,9 @@ function StatStrip({ liveCount, settled, volume }: { liveCount: number; settled:
 
 function Stat({ label, value, accent }: { label: string; value: string; accent: string }) {
   return (
-    <div className="rounded-xl border border-ink-700/60 bg-ink-900/60 px-4 py-3">
-      <div className={`font-mono text-xl font-bold tabular-nums ${accent}`}>{value}</div>
+    <div className="relative overflow-hidden rounded-xl border border-ink-700/60 bg-ink-900/60 px-4 py-3 shadow-lg shadow-black/20">
+      <span className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-pitch-500/60 to-transparent" />
+      <div className={`font-mono text-2xl font-bold tabular-nums ${accent}`}>{value}</div>
       <div className="text-[11px] uppercase tracking-wider text-slate-500">{label}</div>
     </div>
   );
