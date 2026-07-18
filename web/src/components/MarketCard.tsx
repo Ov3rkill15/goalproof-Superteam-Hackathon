@@ -1,5 +1,5 @@
 import { type MarketState, predicateLabel } from "../data/markets";
-import { explorerTx } from "../config";
+import { explorerTx, explorerAddress } from "../config";
 import { COMPARISON_SYMBOL } from "../data/catalog";
 
 const NOUN: Record<number, string> = { 1: "goals", 2: "goals", 3: "yellows", 4: "yellows", 5: "reds", 6: "reds", 7: "corners", 8: "corners" };
@@ -95,7 +95,13 @@ function Resolved({ market }: { market: MarketState }) {
     <div className="space-y-2">
       <div className={`flex items-center gap-2 font-semibold ${won ? "text-pitch-400" : "text-rose-400"}`}>
         <span>{won ? "✓ YES" : "✗ NO"} wins</span>
-        <span className="font-normal text-slate-500">· proof-backed on-chain</span>
+        {r.onChain ? (
+          <span className="rounded bg-pitch-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-pitch-400" title="settled by real CPI into txoracle validate_stat on devnet">
+            ✓ VERIFIED ON-CHAIN
+          </span>
+        ) : (
+          <span className="font-normal text-slate-500">· proof-backed on-chain</span>
+        )}
       </div>
       <div className="rounded-lg bg-ink-900/70 p-2 font-mono text-[10.5px] leading-relaxed text-slate-400">
         <div>
@@ -106,16 +112,41 @@ function Resolved({ market }: { market: MarketState }) {
           root: <span className="text-slate-300">{r.proofRootPreview.slice(0, 16)}…</span>
         </div>
       </div>
-      <a
-        href={explorerTx(r.txSignature)}
-        target="_blank"
-        rel="noreferrer"
-        className="inline-flex items-center gap-1 text-pitch-400 hover:text-pitch-500 transition-colors"
-        title="resolve tx: CPI into txoracle validate_stat"
-      >
-        <span className="font-mono">{r.txSignature.slice(0, 8)}…{r.txSignature.slice(-6)}</span>
-        <span>↗</span>
-      </a>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <a
+          href={explorerTx(r.txSignature)}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-1 text-pitch-400 hover:text-pitch-500 transition-colors"
+          title="resolve tx: CPI into txoracle validate_stat"
+        >
+          <span className="font-mono">resolve {r.txSignature.slice(0, 6)}…{r.txSignature.slice(-4)}</span>
+          <span>↗</span>
+        </a>
+        {r.onChain && (
+          <>
+            <a
+              href={explorerTx(r.onChain.claimTx)}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-slate-400 hover:text-slate-200 transition-colors"
+              title="claim tx: winner paid out from the market vault"
+            >
+              <span className="font-mono">claim {r.onChain.claimTx.slice(0, 6)}…</span>
+              <span>↗</span>
+            </a>
+            <a
+              href={explorerAddress(r.onChain.marketAddress)}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-slate-400 hover:text-slate-200 transition-colors"
+              title="the market account on devnet"
+            >
+              <span className="font-mono">market ↗</span>
+            </a>
+          </>
+        )}
+      </div>
     </div>
   );
 }

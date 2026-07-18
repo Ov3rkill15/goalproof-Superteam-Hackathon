@@ -1,6 +1,7 @@
 import { type Comparison, type MarketSpec, COMPARISON_SYMBOL, fixturePack, predicateHolds } from "./catalog";
 import { FIXTURE, PERIOD_END, statsAtMinute } from "./timeline";
 import { PERIOD } from "./catalog";
+import { ONCHAIN_SETTLEMENT, onChainProof, type OnChainProof } from "./onchain";
 
 const PREMATCH = -Infinity;
 
@@ -13,6 +14,8 @@ export interface Resolution {
   txSignature: string;
   proofRootPreview: string;
   resolvedAtMinute: number;
+  /** present only on the market that was really settled on devnet (not mock) */
+  onChain?: OnChainProof;
 }
 
 export interface MarketState {
@@ -113,6 +116,13 @@ export function marketAtMinute(spec: MarketSpec, index: number, minute: number):
       proofRootPreview: pseudo(`root-${index}`, 44),
       resolvedAtMinute: resolveMinute,
     };
+    // Overlay the genuine devnet settlement onto its market so one card is real.
+    if (index === ONCHAIN_SETTLEMENT.marketIndex) {
+      resolution.outcome = ONCHAIN_SETTLEMENT.outcome;
+      resolution.txSignature = ONCHAIN_SETTLEMENT.resolveTx;
+      resolution.proofRootPreview = ONCHAIN_SETTLEMENT.proofRootPreview;
+      resolution.onChain = onChainProof;
+    }
   }
 
   const [yesPool, noPool] = SEED_POOLS[index] ?? [500, 500];

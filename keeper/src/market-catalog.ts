@@ -14,8 +14,12 @@ export const STAT = {
 } as const;
 
 /** Period prefix added to a base stat key (e.g. 1000 + 1 = P1 first-half goals). */
+// TxLINE's stat-validation proof reports the full-match period as 100 (verified
+// against a live payload), not 0 — the program checks stat.period == market.period,
+// so full-match markets must store 100. (Period-prefixed values below are the
+// scores-feed key prefixes; their proof-side period encoding is unverified.)
 export const PERIOD = {
-  FULL: 0,
+  FULL: 100,
   H1: 1000,
   HT: 2000,
   H2: 3000,

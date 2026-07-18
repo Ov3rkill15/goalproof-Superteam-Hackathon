@@ -5,10 +5,16 @@
   "type": "module",
   "scripts": {
     "fetch-idl": "tsx src/fetch-idl.ts",
-    "activate": "tsx src/activate-txline.ts"
+    "activate": "tsx src/activate-txline.ts",
+    "setup-mint": "tsx src/setup-mint.ts",
+    "create-market": "tsx src/create-market.ts",
+    "take-position": "tsx src/take-position.ts",
+    "resolve": "tsx src/resolve.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.31.1",
+    "@solana/spl-token": "^0.4.15",
     "@solana/web3.js": "^1.98.0",
     "tweetnacl": "^1.0.3"
   },

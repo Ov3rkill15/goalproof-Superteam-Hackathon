@@ -45,11 +45,33 @@ TxLINE SSE feeds (scores + odds, devnet)
 - [x] Ingestion: SSE consumer + JSONL recorder + replay mode
 - [x] CPI feasibility confirmed: `validate_stat` = 1 read-only PDA, no signer (`program/idl/txoracle.json`)
 - [x] Anchor program source: create_market / take_position / resolve (CPI) / claim
-- [ ] On-chain subscribe + API token activation — script ready (`keeper: npm run activate`), **blocked on devnet SOL faucet**
-- [ ] Build + deploy program to devnet (WSL toolchain install pending)
-- [ ] Keeper bot
-- [ ] Dashboard
-- [ ] Deploy + demo video
+- [x] On-chain subscribe + API token activation (`keeper: npm run activate`)
+- [x] Program deployed to devnet: [`8RnQwJk6FN5rioUaGqEruyXENxQZNBdgJQUHCgpr4MNP`](https://explorer.solana.com/address/8RnQwJk6FN5rioUaGqEruyXENxQZNBdgJQUHCgpr4MNP?cluster=devnet)
+- [x] Keeper bot: create-market / take-position / resolve (CPI) / claim scripts run against devnet
+- [x] **Full settlement proven end-to-end on devnet** — market resolved by CPI into
+  `validate_stat`, winner paid out automatically (see below)
+- [x] Dashboard wired to the real settled market (links to live devnet txs)
+- [ ] Deploy dashboard + demo video
+
+## Live settlement proof (devnet)
+
+A real market was opened, bet on both sides, resolved trustlessly (the program CPIs
+into txoracle `validate_stat`, which verifies a TxLINE Merkle proof on-chain — the tx
+only lands if the proof + predicate verify), and the winner claimed their payout.
+Market: "total goals > 2?" on fixture `18213979`, proven `home 1 + away 2 = 3 > 2` → **YES**.
+
+| Step | Tx (Solana Explorer, devnet) |
+|---|---|
+| Create market | [`7quy5nVP…9L5nBf`](https://explorer.solana.com/tx/7quy5nVPnaHHGRJeisU9LhBqcS5U26QFFKLYxtV8cL4MeSd48mYawMNHWMbijGx6Dk1vEAB1xRSasBRcV9L5nBf?cluster=devnet) |
+| Position YES | [`4S2G4NsL…MY8akgp`](https://explorer.solana.com/tx/4S2G4NsLFFEi3ysdHhFD3Aknwy6MonsNRQKHLBBECjJAPZB6B51ut7pBmNJk59UpqaeyT7w9E8VmuuaAqMY8akgp?cluster=devnet) |
+| Position NO | [`7EAY3vQk…v42LPwvr5`](https://explorer.solana.com/tx/7EAY3vQkWepT1Pdd1vTpAH21WLz4uY5zWdarZqnLjkzYWZXxHYJ1RQZb8wQti7jFaDSMgp7Cdpu381v42LPwvr5?cluster=devnet) |
+| **Resolve (CPI `validate_stat`)** | [`UqgCj5Gx…bQNMMy`](https://explorer.solana.com/tx/UqgCj5GxGTAmCxTJ89yD7pfhs7axp8NBdn5L2CcKHqtkCYAkBGgS8SySoSTUS8ZxHDyqfxu2LmLuTASLhbQNMMy?cluster=devnet) |
+| **Claim payout** | [`5RajCEi3…83mzrR9X`](https://explorer.solana.com/tx/5RajCEi3LAzdA6NC5zYWUaCpaKNLhyibxSdidw6LRyFc1QhydiFSwTCWPv5yTJWoTzQUMY8hqiBkUimq83mzrR9X?cluster=devnet) |
+
+Market account: [`EzFT9cpf…hTUSDB`](https://explorer.solana.com/address/EzFT9cpfKBpaL43TTJQb1u3k7hC1oNdtMaG2ydhTUSDB?cluster=devnet) ·
+TxLINE daily scores root read during resolve: [`EdJuEftT…PwGffB`](https://explorer.solana.com/address/EdJuEftTBNwXRWJpvYCziVxKT87qMDVu9V6HC7PwGffB?cluster=devnet)
+
+Reproduce: `cd keeper && npm run setup-mint && npm run create-market -- --fixture 18213979 --pick 0 && npm run take-position -- --market <id> --side yes --amount 100 && npm run take-position -- --market <id> --side no --amount 60 && npm run resolve -- --market <id> --seq 1184 --claim`
 
 ## Quickstart (ingestion)
 
