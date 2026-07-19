@@ -108,6 +108,109 @@ input[type="range"]::-webkit-slider-thumb {
 }
 .animate-float-up { animation: floatUp 0.4s ease-out both; }
 
+/* Match Theater — CSS-3D pitch ------------------------------------------- */
+.theater-scene {
+  perspective: 900px;
+  perspective-origin: 50% 20%;
+  padding: 2.75rem 1rem 0.5rem;
+  overflow: hidden;
+}
+.theater-pitch {
+  position: relative;
+  margin: 0 auto;
+  width: min(640px, 92%);
+  aspect-ratio: 100 / 64;
+  transform-style: preserve-3d;
+}
+.theater-anchor {
+  position: absolute;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+}
+.theater-billboard {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transform-origin: 50% 100%;
+  white-space: nowrap;
+}
+.theater-glyph {
+  line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+}
+.theater-caption {
+  font-size: 10px;
+  font-weight: 600;
+  color: #eaeef6;
+  background: rgba(11, 14, 21, 0.85);
+  border: 1px solid rgba(124, 108, 255, 0.35);
+  border-radius: 6px;
+  padding: 2px 7px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+}
+@keyframes theaterPop {
+  0% { opacity: 0; transform: translate(-50%, -100%) rotateX(-52deg) scale(0.6); }
+  60% { transform: translate(-50%, -100%) rotateX(-52deg) scale(1.12); }
+  100% { opacity: 1; transform: translate(-50%, -100%) rotateX(-52deg) scale(1); }
+}
+.theater-pop { animation: theaterPop 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.theater-burst {
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  transform: translate(-50%, 50%);
+  background: radial-gradient(circle, rgba(154, 140, 255, 0.55) 0%, transparent 65%);
+  animation: burstFade 1.6s ease-out both;
+  pointer-events: none;
+}
+@keyframes burstFade {
+  0% { opacity: 0; scale: 0.4; }
+  25% { opacity: 1; }
+  100% { opacity: 0; scale: 1.9; }
+}
+.theater-beam {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 20%, rgba(166, 224, 47, 0.22) 50%, transparent 80%);
+  background-size: 250% 100%;
+  animation: beamSweep 2.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+  pointer-events: none;
+}
+@keyframes beamSweep {
+  0% { background-position: 120% 0; opacity: 0; }
+  15% { opacity: 1; }
+  100% { background-position: -120% 0; opacity: 0; }
+}
+.theater-chip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 50% 100%;
+  width: 86px;
+  padding: 4px 7px;
+  border-radius: 7px;
+  border: 1px solid rgba(34, 39, 54, 0.9);
+  background: rgba(16, 19, 28, 0.88);
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: #94a3b8;
+  text-align: center;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+  transition: border-color 0.4s, box-shadow 0.4s;
+}
+.theater-chip-resolved {
+  border-color: rgba(166, 224, 47, 0.4);
+  box-shadow: 0 0 0 1px rgba(166, 224, 47, 0.12), 0 6px 18px -4px rgba(166, 224, 47, 0.3);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;

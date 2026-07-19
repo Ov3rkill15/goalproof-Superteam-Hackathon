@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { MatchHeader } from "./components/MatchHeader";
+import { MatchTheater } from "./components/MatchTheater";
 import { MarketCard } from "./components/MarketCard";
 import { ReplayBar } from "./components/ReplayBar";
 import { useReplay } from "./replay/useReplay";
@@ -27,6 +28,8 @@ export function Dashboard() {
       <div className="mt-5">
         <MatchHeader minute={replay.minute} />
       </div>
+
+      <MatchTheater minute={replay.minute} markets={markets} />
 
       <HowItSettles />
 
