@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>GoalProof — Superteam World Cup Presentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink-950: #07090e; --ink-900: #0b0e15; --ink-850: #10131c; --ink-800: #161a25;
+    --ink-700: #222736; --ink-600: #333a4d;
+    --violet-300: #b3a8ff; --violet-400: #9a8cff; --violet-500: #7c6cff;
+    --citron-300: #d7f77e; --citron-400: #c2f24a; --citron-500: #a6e02f;
+    --yes: #4bb1a2; --no: #cf7080;
+    --text: #eaeef6; --muted: #94a3b8; --dim: #64748b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  @page { size: 1280px 720px; margin: 0; }
+  html, body { background: #000; }
+  .slide {
+    position: relative; width: 1280px; height: 720px; overflow: hidden;
+    background: var(--ink-950); color: var(--text);
+    font-family: "Inter", sans-serif;
+    page-break-after: always; break-after: page;
+    padding: 64px 72px;
+  }
+  .slide::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(70% 45% at 50% -8%, rgba(124,108,255,0.16) 0%, transparent 60%),
+      linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 100% 100%, 44px 44px, 44px 44px;
+  }
+  .slide > * { position: relative; }
+  h1, h2, h3 { font-family: "Space Grotesk", "Inter", sans-serif; letter-spacing: -0.02em; }
+  .mono { font-family: "JetBrains Mono", monospace; }
+  .kicker { font-family: "JetBrains Mono", monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--violet-400); margin-bottom: 14px; }
+  .kicker.citron { color: var(--citron-400); }
+  h2.title { font-size: 42px; font-weight: 700; color: #f8fafc; }
+  .sub { margin-top: 12px; font-size: 18px; line-height: 1.55; color: var(--muted); max-width: 900px; }
+  .footer {
+    position: absolute; left: 72px; right: 72px; bottom: 30px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--dim);
+    border-top: 1px solid rgba(124,108,255,0.15); padding-top: 12px;
+  }
+  .card { background: rgba(16,19,28,0.75); border: 1px solid rgba(34,39,54,0.9); border-radius: 16px; padding: 24px; }
+  .card.citron { border-color: rgba(166,224,47,0.35); box-shadow: 0 0 0 1px rgba(166,224,47,0.10); }
+  .pill { display: inline-block; border-radius: 999px; padding: 4px 14px; font-family: "JetBrains Mono", monospace; font-size: 12px; }
+  .pill.violet { background: rgba(124,108,255,0.15); color: var(--violet-300); border: 1px solid rgba(124,108,255,0.4); }
+  .pill.citron { background: rgba(166,224,47,0.13); color: var(--citron-300); border: 1px solid rgba(166,224,47,0.4); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  ul.clean { list-style: none; }
+  ul.clean li { display: flex; gap: 10px; margin-top: 10px; font-size: 15.5px; line-height: 1.5; color: #cbd5e1; }
+  ul.clean li::before { content: "—"; color: var(--violet-400); flex-shrink: 0; }
+  ul.clean.good li::before { content: "✓"; color: var(--citron-400); }
+  ul.clean.bad li::before { content: "✕"; color: var(--no); }
+  .shield {
+    display: inline-grid; place-items: center; width: 54px; height: 54px; border-radius: 16px;
+    background: linear-gradient(135deg, var(--violet-400), #6455e6);
+    box-shadow: 0 8px 30px rgba(124,108,255,0.35);
+  }
+  .kv { display: flex; justify-content: space-between; gap: 16px; font-family: "JetBrains Mono", monospace; font-size: 13px; padding: 7px 0; border-bottom: 1px dashed rgba(51,58,77,0.6); }
+  .kv:last-child { border-bottom: none; }
+  .kv .k { color: var(--dim); flex-shrink: 0; }
+  .kv .v { color: #cbd5e1; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .kv .v.citron { color: var(--citron-300); }
+  .stat-big { font-family: "Space Grotesk", sans-serif; font-size: 34px; font-weight: 700; color: #f8fafc; }
+  .stat-label { font-family: "JetBrains Mono", monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--dim); margin-top: 4px; }
+  .arrow { color: var(--ink-600); font-size: 26px; align-self: center; text-align: center; }
+  code.inline { font-family: "JetBrains Mono", monospace; font-size: 0.92em; color: var(--citron-300); background: rgba(166,224,47,0.08); border-radius: 5px; padding: 1px 6px; }
+  code.v { color: var(--violet-300); background: rgba(124,108,255,0.10); }
+</style>
+</head>
+<body>
+
+<!-- ───────────────────────── SLIDE 1 · TITLE ───────────────────────── -->
+<section class="slide" style="display:flex; flex-direction:column; justify-content:center;">
+  <div style="display:flex; align-items:center; gap:18px; margin-bottom:34px;">
+    <span class="shield">
+      <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#07090e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2 4 5v6c0 5 3.4 8.3 8 11 4.6-2.7 8-6 8-11V5l-8-3Z" fill="#07090e" fill-opacity="0.15"/><path d="m9 12 2 2 4-4"/>
+      </svg>
+    </span>
+    <span style="font-family:'Space Grotesk'; font-size:30px; font-weight:700;">GoalProof</span>
+    <span class="pill violet" style="margin-left:8px;">Solana devnet</span>
+  </div>
+  <h1 style="font-size:64px; font-weight:700; line-height:1.05; max-width:980px; color:#f8fafc;">
+    Prediction markets that <span style="color:var(--violet-400);">settle themselves.</span>
+  </h1>
+  <p class="sub" style="font-size:22px; margin-top:22px; max-width:860px;">
+    Micro-markets on live World Cup stats. When a period ends, the Solana program re-verifies a
+    <b style="color:#e2e8f0;">TxLINE Merkle proof on-chain</b> and pays out only if the math holds —
+    no admin, no trusted oracle, no human in the loop.
+  </p>
+  <div style="margin-top:36px; display:flex; gap:14px; align-items:center;">
+    <span class="pill citron">✓ real on-chain settlement — every tx on Explorer</span>
+    <span class="pill violet mono">goalproof-chi.vercel.app</span>
+  </div>
+  <div class="footer"><span>Superteam World Cup · Prediction Market &amp; Settlement track</span><span>github.com/Ov3rkill15 · MIT</span></div>
+</section>
+
+<!-- ───────────────────────── SLIDE 2 · PROBLEM ───────────────────────── -->
+<section class="slide">
+  <div class="kicker">The problem</div>
+  <h2 class="title">Every prediction market has the same weak link: the oracle</h2>
+  <p class="sub">Markets live on-chain, but the <i>outcome</i> almost never does. Someone you must trust types in the result.</p>
+  <div class="grid2" style="margin-top:40px;">
+    <div class="card">
+      <h3 style="font-size:20px; color:#e2e8f0;">Status quo — reported settlement</h3>
+      <ul class="clean bad">
+        <li>An admin key or oracle service declares the winner off-chain.</li>
+        <li>You trust that they read the feed correctly — and honestly.</li>
+        <li>Disputes are a support ticket, not a proof.</li>
+        <li>One compromised reporter = every open market at risk.</li>
+      </ul>
+    </div>
+    <div class="card citron">
+      <h3 style="font-size:20px; color:#f8fafc;">GoalProof — verified settlement</h3>
+      <ul class="clean good">
+        <li>TxLINE anchors match stats into a daily Merkle root <b>on Solana</b>.</li>
+        <li>The program re-checks the stat's Merkle proof <b>on-chain via CPI</b>.</li>
+        <li>Payout executes only if the proof + predicate verify.</li>
+        <li>There is <b>no manual override anywhere in the program</b>.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer"><span>GoalProof</span><span>02 / 10</span></div>
+</section>
+
+<!-- ───────────────────────── SLIDE 3 · PRODUCT ───────────────────────── -->
+<section class="slide">
+  <div class="kicker">The product</div>
+  <h2 class="title">A quiz for every minute you watch</h2>
+  <p class="sub">For each fixture, GoalProof auto-generates a pack of 7 provable micro-markets — only stats TxLINE can Merkle-prove are ever listed.</p>
+  <div class="grid3" style="margin-top:36px;">
+    <div class="card">
+      <div class="stat-big" style="color:var(--violet-300);">7 markets</div>
+      <div class="stat-label">per fixture, auto-generated</div>
+      <ul class="clean" style="margin-top:10px; font-size:14px;">
+        <li>Total goals &gt; 2 · match winner</li>
+        <li>Red card · corners &gt; 9 · yellows &gt; 4</li>
+        <li>Goal in 1st half · goal in 2nd half</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="stat-big" style="color:var(--violet-300);">Live board</div>
+      <div class="stat-label">markets follow the match</div>
+      <ul class="clean" style="margin-top:10px; font-size:14px;">
+        <li>OPEN → LOCKED at kick-off</li>
+        <li>Proofs fetched at HT &amp; FT</li>
+        <li>SETTLED with explorer receipts</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="stat-big" style="color:var(--violet-300);">Match Theater</div>
+      <div class="stat-label">CSS-3D pitch, feed-driven</div>
+      <ul class="clean" style="margin-top:10px; font-size:14px;">
+        <li>Goals, cards &amp; corners land live on a 3D pitch</li>
+        <li>Mouse-driven camera, zero dependencies</li>
+        <li>Citron beam = the on-chain proof moment</li>
+      </ul>
+    </div>
+  </div>
+  <p style="margin-top:26px; font-size:14px; color:var(--dim);">
+    Replay mode ships in the product: the judged demo replays fixture <span class="mono">18213979</span> (Norway 1–2 England) deterministically — required, since World Cup fixtures end before judging.
+  </p>
+  <div class="footer"><span>GoalProof</span><span>03 / 10</span></div>
+</section>
+
+<!-- ───────────────────────── SLIDE 4 · HOW IT SETTLES ───────────────────────── -->
+<section class="slide">
+  <div class="kicker citron">Settlement pipeline</div>
+  <h2 class="title">From whistle to payout, in three moves</h2>
+  <div style="display:grid; grid-template-columns: 1fr 40px 1fr 40px 1fr; gap:0; margin-top:48px;">
+    <div class="card">
+      <div class="mono" style="font-size:26px; font-weight:700; color:var(--violet-400);">01</div>
+      <h3 style="margin-top:10px; font-size:21px;">Anchored</h3>
+      <p style="margin-top:10px; font-size:15px; line-height:1.55; color:var(--muted);">
+        TxLINE commits every match stat into a <b style="color:#e2e8f0;">daily Merkle root stored on Solana</b>.
+        The truth is on-chain before any market resolves.
+      </p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="card">
+      <div class="mono" style="font-size:26px; font-weight:700; color:var(--violet-400);">02</div>
+      <h3 style="margin-top:10px; font-size:21px;">Proven</h3>
+      <p style="margin-top:10px; font-size:15px; line-height:1.55; color:var(--muted);">
+        At period end, the keeper bot pulls that stat's Merkle proof from
+        <code class="inline v">/scores/stat-validation</code> and submits it to the program.
+      </p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="card citron">
+      <div class="mono" style="font-size:26px; font-weight:700; color:var(--citron-400);">03</div>
+      <h3 style="margin-top:10px; font-size:21px;">Verified</h3>
+      <p style="margin-top:10px; font-size:15px; line-height:1.55; color:var(--muted);">
+        <code class="inline">resolve</code> CPIs into txoracle <code class="inline">validate_stat</code>:
+        proof re-hashed to the root, predicate evaluated, <b style="color:#e2e8f0;">payout only if it verifies</b>.
+      </p>
+    </div>
+  </div>
+  <div class="card" style="margin-top:30px; padding:16px 24px;">
+    <span class="mono" style="font-size:13.5px; color:var(--muted);">
+      Deterministic by construction: the outcome is <b style="color:var(--citron-300);">derived from the proven value</b>, never asserted.
+      The NO side settles on the exact <b style="color:#e2e8f0;">complement predicate</b> — both outcomes equally proof-backed.
+    </span>
+  </div>
+  <div class="footer"><span>GoalProof</span><span>04 / 10</span></div>
+</section>
+
+<!-- ───────────────────────── SLIDE 5 · LIVE PROOF ───────────────────────── -->
+<section class="slide">
+  <div class="kicker citron">Not a mockup</div>
+  <h2 class="title">One market, start to finish, on devnet</h2>
+  <p class="sub">"Norway vs England: total goals &gt; 2?" — opened, bet on both sides, resolved by Merkle proof, paid out. Every signature resolves on Solana Explorer.</p>
+  <div class="grid2" style="margin-top:30px; grid-template-columns: 0.9fr 1.1fr;">
+    <div>
+      <div class="grid2" style="gap:14px;">
+        <div class="card" style="padding:18px;"><div class="stat-big" style="font-size:28px;">3 goals</div><div class="stat-label">proven stat (1 + 2)</div></div>
+        <div class="card citron" style="padding:18px;"><div class="stat-big" style="font-size:28px; color:var(--citron-300);">YES · paid</div><div class="stat-label">outcome</div></div>
+        <div class="card" style="padding:18px;"><div class="stat-big" style="font-size:28px;">1.4M CU</div><div class="stat-label">compute for merkle verify</div></div>
+        <div class="card" style="padding:18px;"><div class="stat-big" style="font-size:28px;">0 humans</div><div class="stat-label">in the settlement loop</div></div>
+      </div>
+    </div>
+    <div class="card" style="padding:20px 24px;">
+      <div class="kv"><span class="k">program</span><span class="v">8RnQwJk6FN5rioUaGqEruyXENxQZNBdgJQUHCgpr4MNP</span></div>
+      <div class="kv"><span class="k">market</span><span class="v">EzFT9cpfKBpaL43TTJQb1u3k7hC1oNdtMaG2ydhTUSDB</span></div>
+      <div class="kv"><span class="k">create</span><span class="v">7quy5n…L5nBf</span></div>
+      <div class="kv"><span class="k">bet YES / bet NO</span><span class="v">4S2G4N…Y8akgp · 7EAY3v…LPwvr5</span></div>
+      <div class="kv"><span class="k">resolve (CPI)</span><span class="v citron">UqgCj5GxGTAmCxTJ89yD7pfhs7axp8NBdn…bQNMMy</span></div>
+      <div class="kv"><span class="k">claim payout</span><span class="v citron">5RajCEi3LAzdA6NC5zYWUaCpaKNLhyibxS…mzrR9X</span></div>
+      <div class="kv"><span class="k">merkle root (event)</span><span class="v">011d84f6c3121bb7…2b2cabec</span></div>
+    </div>
+  </div>
+  <p style="margin-top:22px; font-size:14px; color:var(--dim);">Tx logs show: <span class="mono" style="color:var(--citron-300);">goalproof → CPI txoracle::validate_stat → "Find valid on-chain root" → predicate ✓ → success</span></p>
+  <div class="footer"><span>GoalProof</span><span>05 / 10</span></div>
+</section>
+
+<!-- ───────────────────────── SLIDE 6 · ARCHITECTURE ───────────────────────── -->
+<section class="slide">
+  <div class="kicker">Architecture</div>
+  <h2 class="title">Four services, one network</h2>
+  <p class="sub">Everything shares one devnet — same RPC, program ID, SPL mint, and TxLINE endpoint. Clean module boundaries; the dashboard reads one <code class="inline v">MarketState</code> contract.</p>
+  <div class="grid4" style="margin-top:36px;">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;"><span class="mono" style="font-size:16px; font-weight:600; color:var(--violet-300);">ingestion/</span><span class="pill violet" style="font-size:10px; padding:2px 8px;">Go</span></div>
+      <p style="margin-top:12px; font-size:13.5px; line-height:1.55; color:var(--muted);">Consumes TxLINE SSE (<span class="mono">scores</span> + <span class="mono">odds</span>), records JSONL → deterministic replay.</p>
+    </div>
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;"><span class="mono" style="font-size:16px; font-weight:600; color:var(--violet-300);">program/</span><span class="pill violet" style="font-size:10px; padding:2px 8px;">Anchor · Rust</span></div>
+      <p style="margin-top:12px; font-size:13.5px; line-height:1.55; color:var(--muted);"><span class="mono">create_market · take_position · resolve (CPI validate_stat) · claim</span> — escrow in a program vault.</p>
+    </div>
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;"><span class="mono" style="font-size:16px; font-weight:600; color:var(--violet-300);">keeper/</span><span class="pill violet" style="font-size:10px; padding:2px 8px;">TypeScript</span></div>
+      <p style="margin-top:12px; font-size:13.5px; line-height:1.55; color:var(--muted);">Watches the feed, detects period end, fetches the proof, submits <span class="mono">resolve</span>. No human trigger.</p>
+    </div>
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;"><span class="mono" style="font-size:16px; font-weight:600; color:var(--violet-300);">web/</span><span class="pill violet" style="font-size:10px; padding:2px 8px;">React · Vite</span></div>
+      <p style="margin-top:12px; font-size:13.5px; line-height:1.55; color:var(--muted);">Live board + Match Theater + replay scrubber; settled cards link to the real devnet txs.</p>
+    </div>
+  </div>
+  <div class="card" style="margin-top:28px; padding:18px 24px;">
+    <span class="mono" style="font-size:13.5px; color:var(--muted);">
+      feed → <span style="color:var(--violet-300);">ingestion</span> → recordings / live → <span style="color:var(--violet-300);">keeper</span> → proof → <span style="color:var(--citron-300);">program (verify on-chain)</span> → payout → <span style="color:var(--violet-300);">web</span> receipts
+    </span>
+  </div>
+  <div class="footer"><span>GoalProof</span><span>06 / 10</span></div>
+</section>
+
+<!-- ───────────────────────── SLIDE 7 · ENGINEERING FINDINGS ───────────────────────── -->
+<section class="slide">
+  <div class="kicker">Code quality · judged criterion</div>
+  <h2 class="title">Three findings that made the CPI actually work</h2>
+  <p class="sub">The docs demonstrate <code class="inline v">validate_stat</code> as an off-chain <code class="inline v">.view()</code>. Making it a real on-chain CPI took verified engineering:</p>
+  <div class="grid3" style="margin-top:36px;">
+    <div class="card">
+      <h3 style="font-size:18px; color:#e2e8f0;">32-byte array hashes</h3>
+      <p style="margin-top:10px; font-size:14.5px; line-height:1.6; color:var(--muted);">
+        TxLINE proof hashes must be passed as raw <code class="inline v">[u8; 32]</code> arrays, not hex strings —
+        the API returns hex, the keeper decodes before building the instruction.
+      </p>
+    </div>
+    <div class="card">
+      <h3 style="font-size:18px; color:#e2e8f0;">Roots-PDA derivation</h3>
+      <p style="margin-top:10px; font-size:14.5px; line-height:1.6; color:var(--muted);">
+        The scores-roots account is a PDA of <code class="inline v">[b"daily_scores_roots", u16(epochDay)]</code> —
+        undocumented; recovered by scanning devnet transactions.
+      </p>
+    </div>
+    <div class="card">
+      <h3 style="font-size:18px; color:#e2e8f0;">1.4M compute units</h3>
+      <p style="margin-top:10px; font-size:14.5px; line-height:1.6; color:var(--muted);">
+        Merkle verification blows the default budget; <code class="inline v">resolve</code> ships with a
+        <code class="inline v">ComputeBudget</code> instruction raising it to 1.4M CU.
+      </p>
+    </div>
+  </div>
+  <ul class="clean" style="margin-top:30px; max-width:1000px;">
+    <li>Deterministic resolution code — outcome derived from the proven value; NO settled via exact predicate complement.</li>
+    <li>Five documented verification points in the settlement path; market catalog shared 1:1 between keeper and dashboard.</li>
+    <li>Honest UI: marker positions labeled illustrative (TxLINE has no player tracking); mock vs real settlement clearly separated in code.</li>
+  </ul>
+  <div class="footer"><span>GoalProof</span><span>07 / 10</span></div>
+</section>
+
+<!-- ───────────────────────── SLIDE 8 · TXLINE USAGE ───────────────────────── -->
+<section class="slide">
+  <div class="kicker">TxLINE integration</div>
+  <h2 class="title">Endpoints used &amp; feedback logged from day one</h2>
+  <div class="grid2" style="margin-top:34px;">
+    <div class="card">
+      <h3 style="font-size:19px; color:#e2e8f0;">Endpoints</h3>
+      <div style="margin-top:14px;">
+        <div class="kv"><span class="k">auth</span><span class="v">POST /auth/guest/start · token activate</span></div>
+        <div class="kv"><span class="k">live streams</span><span class="v">GET /odds/stream · /scores/stream (SSE)</span></div>
+        <div class="kv"><span class="k">proofs</span><span class="v">GET /scores/stat-validation</span></div>
+        <div class="kv"><span class="k">on-chain</span><span class="v">txoracle 6pW64g…yP2J (devnet)</span></div>
+        <div class="kv"><span class="k">predicates</span><span class="v">2-stat op (add/sub) + threshold + comparison</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:19px; color:#e2e8f0;">API feedback (docs/txline-feedback-log.md)</h3>
+      <ul class="clean" style="font-size:14px;">
+        <li>CPI usage of <span class="mono">validate_stat</span> undocumented — confirmed viable (1 read-only account, no signer); worth an official example.</li>
+        <li>Proof hash encoding (hex vs bytes) and roots-PDA seeds had to be reverse-engineered.</li>
+        <li>Guest JWT flow is smooth; SSE streams stable through full match recordings.</li>
+        <li>Compliance: no TxL token wagering — escrow is our own devnet SPL mint.</li>
+      </ul>
+    </div>
+  </div>
+  <p style="margin-top:26px; font-size:14px; color:var(--dim);">Full friction log with dates and workarounds ships in the repo as part of the submission.</p>
+  <div class="footer"><span>GoalProof</span><span>08 / 10</span></div>
+</section>
+
+<!-- ───────────────────────── SLIDE 9 · DEMO ───────────────────────── -->
+<section class="slide">
+  <div class="kicker">Demo · ≤ 5 minutes</div>
+  <h2 class="title">What you'll see in the video</h2>
+  <div class="grid2" style="margin-top:34px; grid-template-columns: 1.15fr 0.85fr;">
+    <div>
+      <ul class="clean" style="font-size:16px;">
+        <li><b style="color:#e2e8f0;">Replay a full match</b> — Norway 1–2 England from a real recorded TxLINE feed; the Match Theater comes alive with goals, cards and corners.</li>
+        <li><b style="color:#e2e8f0;">Markets live their lifecycle</b> — OPEN → LOCKED → SETTLED as events land; proofs fetched at HT and FT (citron beam sweep).</li>
+        <li><b style="color:#e2e8f0;">The money shot</b> — the settled "total goals &gt; 2" card links to the real <span class="mono">resolve</span> tx: CPI into <span class="mono">validate_stat</span>, Merkle root found, predicate verified, payout claimed.</li>
+        <li><b style="color:#e2e8f0;">Architecture in 50 seconds</b> — the four services and the deterministic settlement path.</li>
+      </ul>
+    </div>
+    <div class="card citron" style="align-self:start;">
+      <h3 style="font-size:17px; color:var(--citron-300);">Try it yourself</h3>
+      <div style="margin-top:12px;">
+        <div class="kv"><span class="k">live site</span><span class="v citron">goalproof-chi.vercel.app</span></div>
+        <div class="kv"><span class="k">live board</span><span class="v">…/#/live → press ▶</span></div>
+        <div class="kv"><span class="k">program</span><span class="v">8RnQwJ…4MNP on devnet</span></div>
+        <div class="kv"><span class="k">repo</span><span class="v">public GitHub · MIT</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>GoalProof</span><span>09 / 10</span></div>
+</section>
+
+<!-- ───────────────────────── SLIDE 10 · CLOSE ───────────────────────── -->
+<section class="slide" style="display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+  <span class="shield" style="width:72px; height:72px; border-radius:22px;">
+    <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="#07090e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2 4 5v6c0 5 3.4 8.3 8 11 4.6-2.7 8-6 8-11V5l-8-3Z" fill="#07090e" fill-opacity="0.15"/><path d="m9 12 2 2 4-4"/>
+    </svg>
+  </span>
+  <h2 style="margin-top:30px; font-size:52px; font-weight:700; max-width:900px; line-height:1.1; color:#f8fafc;">
+    Provable markets, settled <span style="color:var(--citron-400);">trustlessly.</span>
+  </h2>
+  <p class="sub" style="margin-top:20px; text-align:center; font-size:19px;">
+    Every settlement is independently verifiable on Solana Explorer.<br/>
+    The resolution code is the spec — clean, deterministic, and open.
+  </p>
+  <div style="margin-top:36px; display:flex; gap:14px;">
+    <span class="pill violet mono">goalproof-chi.vercel.app</span>
+    <span class="pill citron mono">resolve tx: UqgCj5…QNMMy</span>
+    <span class="pill violet mono">devnet · MIT</span>
+  </div>
+  <div class="footer"><span>GoalProof — Superteam World Cup 2026</span><span>10 / 10</span></div>
+</section>
+
+</body>
+</html>
