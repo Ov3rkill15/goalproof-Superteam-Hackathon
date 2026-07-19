@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { FRAMES, currentFrame, phaseAtMinute, type Frame } from "../data/timeline";
 import type { MarketState } from "../data/markets";
 
@@ -10,7 +10,9 @@ import type { MarketState } from "../data/markets";
 // the events, minutes and stats themselves are the real feed data. The caption
 // under the pitch says exactly that.
 //
-// Pure CSS 3D transforms — no three.js, no new dependencies.
+// Pure CSS 3D transforms — no three.js, no new dependencies. The "camera" is
+// mouse-driven: pointer position nudges the plane's tilt/orbit via CSS vars
+// (set directly on the element, so mousemove never re-renders React).
 
 const TILT = 52; // degrees the pitch plane is rotated back by
 
@@ -66,6 +68,7 @@ const CHIP_LABEL = ["Goals > 2", "Home win", "Red card", "Corners > 9", "Yellows
 
 export function MatchTheater({ minute, markets }: { minute: number; markets: MarketState[] }) {
   const phase = phaseAtMinute(minute);
+  const pitchRef = useRef<HTMLDivElement>(null);
 
   const markers = useMemo(
     () =>
@@ -78,6 +81,7 @@ export function MatchTheater({ minute, markets }: { minute: number; markets: Mar
   const frame = currentFrame(minute);
   const last = markers[markers.length - 1];
   const liveMarker = last && frame.event && frame.minute === last.minute ? last : null;
+  const liveGoal = liveMarker?.kind === "goal" ? liveMarker : null;
 
   // The proof moment: markets resolve at HT (45) and FT (90) — citron beam sweep.
   const proofSweep = (minute >= 45 && minute < 48) || (minute >= 90 && minute < 93);
@@ -85,14 +89,58 @@ export function MatchTheater({ minute, markets }: { minute: number; markets: Mar
 
   if (phase === "PRE") return null;
 
+  // Mouse-driven camera: nudge tilt (±5°) and orbit (±6°) toward the pointer.
+  const onMove = (e: React.MouseEvent<HTMLElement>) => {
+    const el = pitchRef.current;
+    if (!el) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    const nx = (e.clientX - r.left) / r.width - 0.5;
+    const ny = (e.clientY - r.top) / r.height - 0.5;
+    el.style.setProperty("--dy", `${(nx * 12).toFixed(2)}deg`);
+    el.style.setProperty("--dx", `${(-ny * 10).toFixed(2)}deg`);
+  };
+  const onLeave = () => {
+    const el = pitchRef.current;
+    if (!el) return;
+    el.style.setProperty("--dx", "0deg");
+    el.style.setProperty("--dy", "0deg");
+  };
+
   return (
-    <section aria-label="Match theater" className="relative mt-4 overflow-hidden rounded-2xl border border-ink-700/60 bg-ink-900/40 backdrop-blur-sm">
-      <div className="theater-scene">
-        <div className="theater-pitch" style={{ transform: `rotateX(${TILT}deg)` }}>
+    <section
+      aria-label="Match theater"
+      className="relative mt-4 overflow-hidden rounded-2xl border border-ink-700/60 bg-ink-900/40 backdrop-blur-sm"
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+    >
+      {/* floodlight glows, fixed to the scene (not the plane) */}
+      <div aria-hidden className="theater-floodlight theater-floodlight-l" />
+      <div aria-hidden className="theater-floodlight theater-floodlight-r" />
+
+      <div className={`theater-scene ${liveGoal ? "theater-punch" : ""}`} key={liveGoal ? `g${liveGoal.minute}` : "scene"}>
+        <div
+          ref={pitchRef}
+          className="theater-pitch"
+          style={{ transform: `rotateX(calc(${TILT}deg + var(--dx, 0deg))) rotateZ(var(--dy, 0deg))` }}
+        >
+          {/* stadium bowl: apron around the pitch + extruded slab beneath it */}
+          <div aria-hidden className="theater-apron" />
+          <div aria-hidden className="theater-slab" />
+
           <PitchLines />
 
           {/* proof beam — the on-chain settlement moment, citron by design system */}
           {proofSweep && <div key={sweepKey} aria-hidden className="theater-beam" />}
+
+          {/* the ball, gliding from the centre to the goal mouth on a live goal */}
+          {liveGoal && (
+            <span
+              key={`ball-${liveGoal.minute}`}
+              aria-hidden
+              className="theater-ball"
+              style={{ "--bx": `${liveGoal.x}%`, "--by": `${liveGoal.y}%` } as React.CSSProperties}
+            />
+          )}
 
           {/* floating market chips along the far touchline */}
           <div className="hidden sm:block" aria-hidden>
@@ -133,8 +181,9 @@ export function MatchTheater({ minute, markets }: { minute: number; markets: Mar
       </div>
 
       <p className="relative border-t border-ink-700/40 px-4 py-2 text-center text-[10.5px] text-slate-500">
+        <span className="hidden sm:inline">Move the mouse — the camera follows · </span>
         Events, minutes &amp; stats are feed data · marker positions illustrative (TxLINE has no player tracking) ·{" "}
-        <span className="text-proof-400">citron sweep = proofs fetched &amp; verified on-chain</span>
+        <span className="text-proof-400">citron sweep = proofs verified on-chain</span>
       </p>
     </section>
   );
@@ -145,7 +194,7 @@ function MarketChip({ market, label, x }: { market: MarketState; label: string; 
   const resolved = market.lifecycle === "resolved";
   const yesPct = Math.round(market.impliedYes * 100);
   return (
-    <div className="theater-anchor" style={{ left: `${x}%`, top: "-4%" }}>
+    <div className="theater-anchor" style={{ left: `${x}%`, top: "-5%" }}>
       <div
         className={`theater-chip ${resolved ? "theater-chip-resolved" : ""}`}
         style={{ transform: `translate(-50%, -100%) rotateX(${-TILT}deg)` }}

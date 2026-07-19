@@ -118,10 +118,69 @@ input[type="range"]::-webkit-slider-thumb {
 .theater-pitch {
   position: relative;
   margin: 0 auto;
-  width: min(640px, 92%);
+  width: min(680px, 93%);
   aspect-ratio: 100 / 64;
   transform-style: preserve-3d;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
 }
+/* stadium bowl floor around the pitch */
+.theater-apron {
+  position: absolute;
+  inset: -7% -5%;
+  border-radius: 10px;
+  background: rgba(10, 13, 20, 0.72);
+  border: 1px solid rgba(124, 108, 255, 0.14);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5);
+}
+/* extruded slab beneath the plane — gives the pitch physical thickness */
+.theater-slab {
+  position: absolute;
+  inset: -7% -5%;
+  border-radius: 10px;
+  transform: translateZ(-16px);
+  background: #06080d;
+  box-shadow: 0 0 70px 24px rgba(0, 0, 0, 0.6), 0 0 120px 10px rgba(124, 108, 255, 0.08);
+}
+/* floodlight glows pinned to the scene corners */
+.theater-floodlight {
+  position: absolute;
+  top: -3rem;
+  width: 42%;
+  height: 11rem;
+  pointer-events: none;
+  background: radial-gradient(55% 65% at 50% 0%, rgba(124, 108, 255, 0.13) 0%, transparent 70%);
+  animation: floodPulse 5.5s ease-in-out infinite;
+}
+.theater-floodlight-l { left: -6%; }
+.theater-floodlight-r { right: -6%; animation-delay: 2.7s; }
+@keyframes floodPulse {
+  0%, 100% { opacity: 0.75; }
+  50% { opacity: 1; }
+}
+/* the ball, gliding on the plane toward the goal mouth */
+.theater-ball {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  margin: -5.5px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 30%, #ffffff, #c3cbdd 55%, #6b7488);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.55), 0 0 26px rgba(154, 140, 255, 0.35);
+  animation: ballTravel 0.9s cubic-bezier(0.3, 0.1, 0.55, 1) both;
+}
+@keyframes ballTravel {
+  0% { left: 50%; top: 50%; opacity: 0; scale: 0.6; }
+  18% { opacity: 1; scale: 1; }
+  100% { left: var(--bx, 50%); top: var(--by, 50%); opacity: 1; }
+}
+/* micro camera punch when a goal lands */
+@keyframes camPunch {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.028); }
+  100% { transform: scale(1); }
+}
+.theater-punch { animation: camPunch 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
 .theater-anchor {
   position: absolute;
   width: 0;
