@@ -47,6 +47,27 @@ Friction and highlights recorded during development — the submission form has 
   seems intended but isn't wired. Workaround: prepend a `CreateIdempotent` ATA instruction in
   the same transaction (`keeper/src/activate-txline.ts`).
 
+## Friction found while proving settlement end-to-end (2026-07-18)
+
+- **Merkle hashes are 32-element byte arrays, not base64/hex.** Every hash/root in the
+  `/api/scores/stat-validation` response is a JSON array of 32 numbers. Most SDKs expect
+  base64 or hex for binary blobs; documenting the wire format (or offering hex) would
+  prevent a decode-guessing round-trip. (Fixed in `keeper/src/resolve.ts` `toBytes32`.)
+- **Full-match period is `100`, not `0`.** The proof payload reports period `100` for
+  full-time stats, while the scores-feed composite keys use `0` as the "no prefix" period.
+  Any program that stores the period at market-creation time and compares it at resolve
+  (like ours) hits a mismatch until this is discovered empirically. One line in the docs
+  ("proof-side period codes: 100 = full match, …") would save an afternoon.
+- **`daily_scores_roots` PDA seed is `[b"daily_scores_roots", u16 LE epochDay]`** with
+  `epochDay = floor(unixSeconds / 86400)`. Not documented; recovered by brute-forcing seed
+  encodings against the owner check. Belongs on the Program Reference page.
+- **CPI compute budget:** verifying the Merkle proof via CPI `validate_stat` exceeds the
+  default 200k CU (we run with a 1.4M CU limit ix). Worth a note in the integration docs so
+  teams don't misread "exceeded CUs meter" as a proof failure.
+- **Choosing the right proof event:** the stat-validation endpoint is seq-scoped; the final
+  stats live on the max-seq scores event for the fixture. A convenience alias (e.g.
+  `?seq=latest`) would remove the client-side scan.
+
 ## Highlights (cont.)
 
 - **2026-07-10** — The txoracle program ships a full P2P trading layer on devnet

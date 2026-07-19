@@ -7,7 +7,7 @@
 
 ## Pre-recording checklist
 - [ ] `.env` has a valid `TXLINE_API_TOKEN` (guest JWT auto-refreshes) — needed only if re-running resolve live
-- [ ] Dashboard deployed and reachable (Vercel) — have the public URL on screen; also `cd web && npm run build && npm run preview` as a local fallback
+- [x] Dashboard deployed and reachable: **https://goalproof-chi.vercel.app** (Vercel prod, 2026-07-19); local fallback `cd web && npm run build && npm run preview`
 - [ ] Keeper wallet `2UWQW…RyDV` still funded (≥ 0.1 devnet SOL) in case you re-run the flow on camera
 - [ ] Open browser tabs pre-loaded: (1) dashboard, (2) the **resolve tx** on Solana Explorer (devnet), (3) the **claim tx**, (4) the goalproof program account
 - [ ] `keeper/demo-state.json` present (from the real run) so the on-chain card shows real links
@@ -22,9 +22,12 @@
    the market rail (total goals, match winner, red card, corners, first-half goal).
    Point out live scores/odds and the implied-probability bars. Mention it's a replay
    of a **real recorded TxLINE feed** (fixture 18213979) so it works after the match ends.
-3. **Replay the match (0:45).** Hit play at 4×/8×. Watch markets go OPEN → LIVE(locked)
-   → SETTLED as goals/cards land. Call out that each market locks at kick-off / half-time
-   exactly when the proof for that period becomes available.
+3. **Replay the match (0:45).** Hit play at 4×/8×. The **Match Theater** (CSS-3D pitch)
+   comes alive: goals burst at the correct end, cards & corners land on the pitch, market
+   chips float over the far touchline and flip to citron ✓ when settled, and a citron beam
+   sweeps the pitch at HT/FT — the proofs-verified moment. Watch markets go OPEN →
+   LIVE(locked) → SETTLED as events land. Call out the honesty caption: positions are
+   illustrative (TxLINE has no player tracking); events/minutes/stats are the real feed.
 4. **THE MONEY SHOT — on-chain settlement (1:10).** On the settled "total goals > 2"
    card, show the **✓ VERIFIED ON-CHAIN** badge and click **resolve ↗**. On Solana
    Explorer (devnet) show the tx: `goalproof` invokes → CPI into `txoracle validate_stat`
