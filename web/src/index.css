@@ -253,21 +253,31 @@ input[type="range"]::-webkit-slider-thumb {
   left: 0;
   top: 0;
   transform-origin: 50% 100%;
-  width: 86px;
-  padding: 4px 7px;
-  border-radius: 7px;
-  border: 1px solid rgba(34, 39, 54, 0.9);
-  background: rgba(16, 19, 28, 0.88);
-  font-size: 10.5px;
-  line-height: 1.35;
-  color: #94a3b8;
+  width: 108px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(124, 108, 255, 0.38);
+  background: rgba(13, 16, 25, 0.96);
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: #cbd5e1;
   text-align: center;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(124, 108, 255, 0.08);
   transition: border-color 0.4s, box-shadow 0.4s;
 }
+/* thin stalk grounding each floating chip to the touchline */
+.theater-chip::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 1px;
+  height: var(--stalk, 12px);
+  background: linear-gradient(to bottom, rgba(124, 108, 255, 0.45), transparent);
+}
 .theater-chip-resolved {
-  border-color: rgba(166, 224, 47, 0.4);
-  box-shadow: 0 0 0 1px rgba(166, 224, 47, 0.12), 0 6px 18px -4px rgba(166, 224, 47, 0.3);
+  border-color: rgba(166, 224, 47, 0.55);
+  box-shadow: 0 0 0 1px rgba(166, 224, 47, 0.18), 0 6px 22px -4px rgba(166, 224, 47, 0.4);
 }
 
 @media (prefers-reduced-motion: reduce) {
