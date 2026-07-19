@@ -117,6 +117,13 @@ export function MatchTheater({ minute, markets }: { minute: number; markets: Mar
       <div aria-hidden className="theater-floodlight theater-floodlight-l" />
       <div aria-hidden className="theater-floodlight theater-floodlight-r" />
 
+      {/* market chips as a plain flat strip — regular cards, not part of the 3D plane */}
+      <div className="relative z-10 hidden flex-wrap justify-center gap-2 px-4 pt-3 sm:flex" aria-hidden>
+        {markets.slice(0, 7).map((m, i) => (
+          <MarketChip key={m.id} market={m} label={CHIP_LABEL[i] ?? m.spec.title} />
+        ))}
+      </div>
+
       <div className={`theater-scene ${liveGoal ? "theater-punch" : ""}`} key={liveGoal ? `g${liveGoal.minute}` : "scene"}>
         <div
           ref={pitchRef}
@@ -141,13 +148,6 @@ export function MatchTheater({ minute, markets }: { minute: number; markets: Mar
               style={{ "--bx": `${liveGoal.x}%`, "--by": `${liveGoal.y}%` } as React.CSSProperties}
             />
           )}
-
-          {/* floating market chips along the far touchline */}
-          <div className="hidden sm:block" aria-hidden>
-            {markets.slice(0, 7).map((m, i) => (
-              <MarketChip key={m.id} market={m} label={CHIP_LABEL[i] ?? m.spec.title} x={8 + i * 14} tier={i % 2} />
-            ))}
-          </div>
 
           {/* event markers, standing up from the plane */}
           {markers.map((m, i) => {
@@ -189,28 +189,16 @@ export function MatchTheater({ minute, markets }: { minute: number; markets: Mar
   );
 }
 
-/** One market as a standing billboard on the far side of the pitch.
- *  Perspective shrinks the far touchline hard, so chips are counter-scaled and
- *  staggered on two heights (like tiered stadium ad boards) to stay readable
- *  without colliding — 7 chips at 14% spacing leave ~95px per chip at 680px. */
-function MarketChip({ market, label, x, tier }: { market: MarketState; label: string; x: number; tier: number }) {
+/** One market as a plain flat card in the strip above the pitch. */
+function MarketChip({ market, label }: { market: MarketState; label: string }) {
   const resolved = market.lifecycle === "resolved";
   const yesPct = Math.round(market.impliedYes * 100);
-  const lift = tier === 1 ? 52 : 0; // px up the standing plane for the raised row
   return (
-    <div className="theater-anchor" style={{ left: `${x}%`, top: "-5%" }}>
-      <div
-        className={`theater-chip ${resolved ? "theater-chip-resolved" : ""}`}
-        style={{
-          transform: `translate(-50%, -100%) rotateX(${-TILT}deg) translateY(${-lift}px) scale(1.3)`,
-          "--stalk": `${12 + lift}px`,
-        } as React.CSSProperties}
-      >
-        <span className="block truncate font-semibold text-slate-100">{label}</span>
-        <span className={`block font-mono ${resolved ? "text-proof-300" : "text-slate-300"}`}>
-          {resolved ? (market.resolution?.outcome ? "✓ YES" : "✓ NO") : `YES ${yesPct}%`}
-        </span>
-      </div>
+    <div className={`theater-chip ${resolved ? "theater-chip-resolved" : ""}`}>
+      <span className="block truncate font-semibold text-slate-100">{label}</span>
+      <span className={`block font-mono ${resolved ? "text-proof-300" : "text-slate-300"}`}>
+        {resolved ? (market.resolution?.outcome ? "✓ YES" : "✓ NO") : `YES ${yesPct}%`}
+      </span>
     </div>
   );
 }
